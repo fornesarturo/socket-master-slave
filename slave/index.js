@@ -11,7 +11,16 @@ app.get('/', function(req, res){
 ioClient.on('message', function(msg){
   console.log(msg);
   io.to(serverID).emit('message', "ppepino");
-  //msgArray.push(msg)
+});
+
+// Not tested. Simple implementation to test git on atom
+ioClient.on('splitMsg', function(msg){
+  msgArray.push(msg);
+});
+
+// Not tested. Simple implementation to test git on atom
+ioClient.on('sendMsg', function(msg){
+  ioClient.emit('mergeMsg', msgArray.pop());
 });
 
 ioClient.emit('message', "hola soy gera");
