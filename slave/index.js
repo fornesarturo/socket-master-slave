@@ -11,12 +11,13 @@ ioClient.on('splitMsg', function(msg){
   msgArray.push(msg);
   console.log(msg);
   if(msgArray.length == 2) {
-    console.log(msgArray[0][0].index + " \t\t| " + msgArray[1][0].index)
-    console.log(msgArray[0][0].message + " \t| " + msgArray[1][0].message)
+    console.log(msgArray[0].index + " \t\t| " + msgArray[1].index)
+    console.log(msgArray[0].message + " \t| " + msgArray[1].message)
   }
 });
 
 ioClient.on('sendMsg', function(msg){
+  console.log("Pidiendome cosas");
   ioClient.emit('mergeMsg', msgArray.pop());
 });
 
