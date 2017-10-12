@@ -15,6 +15,7 @@
 	<style>
 
   .bubble-pic{
+    outline: none;
     border-radius: 40px;
     padding: 5px;
     margin-right: 20px;
@@ -225,15 +226,15 @@
 
   <md-card-content flex layout="row">
     <div layout="row" flex="80">
-      <md-input-container>
+      <md-input-container ng-show="receivedMsg[0]!=''">
         <input ng-model="receivedMsg[0]" aria-label="input1">
       </md-input-container>
 
-      <md-input-container>
+      <md-input-container ng-show="receivedMsg[1]!=''">
         <input ng-model="receivedMsg[1]" aria-label="input2">
       </md-input-container>
 
-      <md-input-container>
+      <md-input-container ng-show="receivedMsg[2]!=''">
         <input ng-model="receivedMsg[2]" aria-label="input3">
       </md-input-container>
 
@@ -291,7 +292,7 @@
        }
      }])
 
-     app.controller('masterCtrl', function($scope, socket, $mdToast, $mdDialog) {
+     app.controller('masterCtrl', function($scope, socket, $mdToast, $mdDialog, $location, $window) {
        $scope.message="";
        $scope.connectedUsers = 0;
        $scope.receivedMsg = [];
@@ -308,30 +309,30 @@
      img: 'pepino-a.jpg'
    }]
 
-   socket.on('connectedUsers', function(socketId){
-     console.log('User connected '+socketId);
-     $scope.$apply(function() { $scope.connectedUsers++; });
+   socket.on('refresh', function(msg){
+     console.log("jejejedscs")
+      $window.location.reload();
    })
 
-   socket.on('disconnectedUser', function(socketId){
-     console.log('User disconnected '+socketId);
-     $scope.$apply(function() { $scope.connectedUsers--; });
+   socket.on('connectedUsers', function(num){
+     $scope.$apply(function() {
+       $scope.connectedUsers = num;
+     });
    })
 
-   socket.on('receiveMsg', function(msg) {
-     $scope.receivedMsg[msg.index] = msg.message;
-   });
+   socket.on('disconnectedUser', function(num){
+     $scope.$apply(function() {
+       $scope.connectedUsers = num; });
+   })
 
-   	socket.on('mergeMsg', function(msg){
-   		console.log("Reciving message at position: "+msg.index);
+   	socket.on('mergeResults', function(msg){
+   		console.log("Getting message at position: "+msg.index);
       $scope.$apply(function() {
         $scope.receivedMsg[msg.index] = msg.message;
       });
-   	// 	if(receivedMsg[0]&&receivedMsg[1]&&receivedMsg[2]){
-   	// 		console.log(receivedMsg[0]+""+receivedMsg[1]+""+receivedMsg[2])
-   	// 	}else{
-   	// 		socket.emit('sendMsg', "Give me more, slaves");
-   	// 	}
+   		if(!receivedMsg[0]||!receivedMsg[1]||!receivedMsg[2]){
+   			socket.emit('sendMsg', "Give me more, slaves");
+   		}
    	})
 
     $scope.askMessage = function(){
@@ -353,7 +354,6 @@
 
      $scope.sendMessage = function(){
       var messageArray = sliceMessage($scope.message);
-      console.log("Sending splitted message from client ")
       socket.emit('sendSplittedMessage', messageArray);
       $mdToast.show(
       $mdToast.simple()
@@ -362,6 +362,7 @@
         .hideDelay(3000)
     );
     $scope.message = "";
+    $scope.receivedMsg = [];
     }
 
     $scope.showProfilePic = function(ev) {
