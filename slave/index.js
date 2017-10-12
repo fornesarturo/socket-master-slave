@@ -1,6 +1,6 @@
 var app = require('express')();
 var http = require('http').Server(app);
-var ioClient = require('socket.io-client')("http://10.43.53.181:3000");
+var ioClient = require('socket.io-client')("http://10.43.50.254:3006");
 var msgArray = [];
 
 app.get('/', function(req, res){
@@ -21,4 +21,9 @@ ioClient.on('sendMsg', function(msg){
   ioClient.emit('mergeMsg', msgArray.pop());
 });
 
-ioClient.emit('message', "Hola Cassandra. Soy Miguel. Ppepnio");
+ioClient.on('deleteArray', function(msg){
+  console.log("Dump all my stuff :(");
+  msgArray = [];
+})
+
+ioClient.emit('message', "Hola Cassandra. Soy Arturo. Duraznio");
